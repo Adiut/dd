@@ -1,0 +1,125 @@
+use P1
+show tables;
+create table Account (Ac_no int primary key, b_name varchar(10), balance int, foreign key (b_name) references branch (b_name) );
+desc account;
+create table customer (c_name varchar(10) primary key, c_street varchar(10), c_city varchar(10));
+desc customer;
+create table depositor ( c_name varchar(10), Ac_no int, foreign key (c_name) references customer (c_name), foreign key (Ac_no) references account(Ac_no) );
+desc depositor;
+create table loan (l_no int primary key, b_name varchar(10), amt int,foreign key (b_name) references branch (b_name) );
+desc loan;
+create table borrower (c_name varchar(10),l_no int,foreign key (c_name) references customer (c_name),foreign key (l_no) references loan (l_no) );
+desc borrower;
+show tables;
+desc branch;
+insert into branch values ("Akurdi" , "Pune" ,2544600);
+insert into branch values ("P_station" , "Pune" ,4344600);
+insert into branch values ("Nigdi" , "Pune" ,1544600);
+insert into branch values ("Pimpri" , "Pune" ,8544600);
+insert into branch values ("Dadar" , "Mumbai" ,3544600);
+insert into branch values ("Andheri" , "Mumbai" ,5544600);
+select * from branch;
+desc account;
+insert into account values (10010 , "Akurdi" ,23454);
+insert into account values (10011 , "Andheri" ,13454);
+insert into account values (10012 , "Dadar" ,10054);
+insert into account values (10013 , "Nigdi" ,65456);
+insert into account values (10014 , "P_station" ,165456);
+insert into account values (10015 , "Pimpri" ,265456);
+select * from account;
+desc customer;
+insert into customer values ("Aditya" , "dhayari" ,"Pune");
+insert into customer values ("Pratik" , "nagar" ,"Pune");
+insert into customer values ("Vedant" , "andheri" ,"Mumbai");
+insert into customer values ("Saurabh" , "bund garden" ,"Pune");
+insert into customer values ("Anna" , "thane" ,"Mumbai");
+desc depositor;
+select * from account;
+insert into depositor values ("Aditya" , 10015);
+insert into depositor values ("Pratik" , 10012);
+insert into depositor values ("Vedant" , 10013);
+insert into depositor values ("Anna" , 10011);
+insert into depositor values ("Saurabh" , 10014);
+select * from depositor;
+desc loan;
+insert into loan values (11101, "Pimpri" , 500000);
+insert into loan values (11102, "Akurdi" , 25000);
+insert into loan values (11103, "Dadar" , 32500);
+insert into loan values (11104, "Nigdi" , 40500);
+insert into loan values (11105, "P_station" , 80000);
+insert into loan values (11106, "Andheri" , 50000);
+select * from loan;
+desc borrower;
+select * from customer;
+insert into borrower values ("Aditya" , 11101);
+insert into borrower values ("Anna" , 11102);
+insert into borrower values ("Saurabh" , 11105);
+insert into borrower values ("Pratik" , 11103);
+insert into borrower values ("Vedant" , 11104);
+select * from borrower;
+select * from loan;
+select * from depositor;
+select * from customer;
+select * from account;
+
+#################*****Queries****(P1)*****#####################
+
+1.	Find the names of all branches in loan relation.
+select b_name from loan;
+2.	Find all loan numbers for loans made at Akurdi Branch with loan amount > 12000.
+select l_no,b_name from loan where b_name = "Akurdi" and amt >12000;
+3.	Find all customers who have a loan from bank. Find their names,loan_no and loan amount.
+select borrower.c_name,loan.l_no,loan.amt from loan,borrower where loan.l_no = borrower.l_no;
+4.	Find all customers who have both account and loan at bank.
+select depositor.c_name from depositor,borrower where borrower.c_name = depositor.c_name;
+5.	Find the average account balance at each branch.
+select avg(balance),b_name from account group by b_name;
+6.Find no. of depositors at each branch.
+select b_name,count(*) from account group by b_name;
+7.	Calculate total loan amount given by bank.
+select sum(amt) from loan;
+8.	Display distinct cities of branch.
+select distinct b_city from branch;
+
+
+#################*****Queries****(P3)*****#####################
+
+1.	Create a View1 to display List all customers in alphabetical order who have loan from Pune_Station branch.
+create view view1 as  select borrower.c_name,loan.b_name from loan,borrower where loan.l_no = borrower.l_no and b_name = "P_station" order by borrower.c_name ;
+select * from view1;
+
+2.	Create View2 on branch table by selecting any two columns and perform insert update delete operations.
+create view view2 as select b_name , balance from branch;
+select * from view2;
+insert into view2 (b_name,balance) values ("Sangvi",555464);
+insert into view2 (b_name,balance) values ("Phulgate",235464);
+update view2 set b_name = "Swargate" where b_name = "Sangvi";
+delete from view2 where b_name = "Phulgate";
+
+3.	Create View3 on borrower and depositor table by selecting any one column from each table perform insert update delete operations.
+create view view3 as select depositor.c_name,borrower.l_no from depositor,borrower where borrower.c_name = depositor.c_name;
+select * from view3;
+same as view 2
+
+4.	Create Union of left and right joint for  all customers who have an account or loan or both at bank.
+select depositor.c_name from depositor left join borrower on depositor.c_name=borrower.c_name union select borrower.c_name from depositor right join borrower on depositor.c_name=borrower.c_name;
+
+5.	Display content of View1,View2,View3.
+select * from View1;
+select * from View2;
+select * from View3;
+
+6.	Create Simple and Unique index.
+create index index_no on account (Ac_no);
+create unique index uid on customer (c_name);
+
+7.	Display index Information.
+show index from account;
+show index from customer;
+
+8.	Truncate table Customer.
+set foreign_key_checks = 0;
+truncate table customer;
+select * from customer;
+set foreign_key_checks = 1;
+
